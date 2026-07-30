@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de Vendas - Acompanhe suas vendas da CentralCart e gastos com Meta Ads em tempo real">
+    <title>Dashboard de Vendas | BloxLoja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">💰</div>
+                <div class="logo-text">
+                    <h1>BloxLoja</h1>
+                    <span>Dashboard de Vendas</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-link active" data-page="dashboard" id="nav-dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Visão Geral</span>
+            </a>
+            <a href="#" class="nav-link" data-page="vendas" id="nav-vendas">
+                <i data-lucide="shopping-cart"></i>
+                <span>Vendas</span>
+            </a>
+            <a href="#" class="nav-link" data-page="metaads" id="nav-metaads">
+                <i data-lucide="megaphone"></i>
+                <span>Meta Ads</span>
+            </a>
+            <a href="#" class="nav-link" data-page="nova-venda" id="nav-nova-venda">
+                <i data-lucide="plus-circle"></i>
+                <span>Nova Venda</span>
+            </a>
+            <a href="#" class="nav-link" data-page="config" id="nav-config">
+                <i data-lucide="settings"></i>
+                <span>Configurações</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-version">
+                <i data-lucide="code-2"></i>
+                <span>v1.0.0</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== MOBILE HEADER ==================== -->
+    <header class="mobile-header" id="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+            <i data-lucide="menu"></i>
+        </button>
+        <span class="mobile-title">💰 BloxLoja</span>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content" id="main-content">
+
+        <!-- ========== PAGE: DASHBOARD ========== -->
+        <section class="page active" id="page-dashboard">
+            <div class="page-header">
+                <div>
+                    <h2>Visão Geral</h2>
+                    <p class="page-subtitle" id="data-hoje"></p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="btn-refresh" title="Atualizar dados">
+                        <i data-lucide="refresh-cw"></i>
+                        <span>Atualizar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-green" id="kpi-receita">
+                    <div class="kpi-icon green">
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Receita Total</span>
+                        <span class="kpi-value" id="kpi-receita-valor">R$ 0,00</span>
+                        <span class="kpi-sub" id="kpi-receita-sub">0 vendas aprovadas</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-red" id="kpi-gastos">
+                    <div class="kpi-icon red">
+                        <i data-lucide="trending-down"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Gasto com Ads</span>
+                        <span class="kpi-value" id="kpi-gastos-valor">R$ 0,00</span>
+                        <span class="kpi-sub" id="kpi-gastos-sub">Meta Ads</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-blue" id="kpi-lucro">
+                    <div class="kpi-icon blue">
+                        <i data-lucide="wallet"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Lucro Líquido</span>
+                        <span class="kpi-value" id="kpi-lucro-valor">R$ 0,00</span>
+                        <span class="kpi-sub" id="kpi-lucro-sub">Receita - Gastos</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-purple" id="kpi-roas">
+                    <div class="kpi-icon purple">
+                        <i data-lucide="target"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">ROAS</span>
+                        <span class="kpi-value" id="kpi-roas-valor">0.00x</span>
+                        <span class="kpi-sub" id="kpi-roas-sub">Retorno sobre gasto em Ads</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i data-lucide="line-chart"></i>
+                        Receita vs Gasto (7 dias)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chart-receita-gasto"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3 class="chart-title">
+                        <i data-lucide="pie-chart"></i>
+                        Vendas por Status
+                    </h3>
+                    <div class="chart-container chart-container-small">
+                        <canvas id="chart-status"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Sales -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3 class="table-title">
+                        <i data-lucide="clock"></i>
+                        Vendas Recentes
+                    </h3>
+                    <a href="#" class="link-ver-todas" data-page="vendas">Ver todas →</a>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table" id="tabela-recentes">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Produto</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Campanha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-recentes">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PAGE: VENDAS ========== -->
+        <section class="page" id="page-vendas">
+            <div class="page-header">
+                <div>
+                    <h2>Todas as Vendas</h2>
+                    <p class="page-subtitle" id="vendas-total-count">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="filtro-busca" placeholder="Buscar por cliente, email ou produto..." class="search-input">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <select id="filtro-status" class="filter-select">
+                        <option value="">Todos os Status</option>
+                        <option value="APROVADO">Aprovado</option>
+                        <option value="PENDENTE">Pendente</option>
+                        <option value="REEMBOLSADO">Reembolsado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="filtro-pagamento" class="filter-select">
+                        <option value="">Todos os Pagamentos</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão">Cartão</option>
+                        <option value="Boleto">Boleto</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sales Table -->
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="data-table" id="tabela-vendas">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Produto</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Pagamento</th>
+                                <th>Campanha</th>
+                                <th>Anúncio</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-vendas">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer" id="vendas-table-footer">
+                    <span id="vendas-showing">Mostrando 0 vendas</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PAGE: META ADS ========== -->
+        <section class="page" id="page-metaads">
+            <div class="page-header">
+                <div>
+                    <h2>Desempenho Meta Ads</h2>
+                    <p class="page-subtitle">Acompanhe seus gastos e resultados das campanhas</p>
+                </div>
+                <div class="header-actions">
+                    <span class="connection-badge" id="meta-connection-badge">
+                        <span class="dot dot-red"></span>
+                        <span>Demo</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Meta Ads KPIs -->
+            <div class="kpi-grid kpi-grid-3">
+                <div class="kpi-card kpi-red">
+                    <div class="kpi-icon red">
+                        <i data-lucide="banknote"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Gasto Total</span>
+                        <span class="kpi-value" id="meta-gasto-total">R$ 0,00</span>
+                        <span class="kpi-sub">Últimos 30 dias</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-blue">
+                    <div class="kpi-icon blue">
+                        <i data-lucide="eye"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Impressões</span>
+                        <span class="kpi-value" id="meta-impressoes">0</span>
+                        <span class="kpi-sub">Pessoas alcançadas</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card kpi-purple">
+                    <div class="kpi-icon purple">
+                        <i data-lucide="mouse-pointer-click"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Cliques</span>
+                        <span class="kpi-value" id="meta-cliques">0</span>
+                        <span class="kpi-sub">No link do anúncio</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Chart -->
+            <div class="chart-card" style="margin-bottom: 24px;">
+                <h3 class="chart-title">
+                    <i data-lucide="bar-chart-3"></i>
+                    Gasto por Campanha
+                </h3>
+                <div class="chart-container">
+                    <canvas id="chart-campanhas"></canvas>
+                </div>
+            </div>
+
+            <!-- Campaigns Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3 class="table-title">
+                        <i data-lucide="list"></i>
+                        Campanhas
+                    </h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table" id="tabela-campanhas">
+                        <thead>
+                            <tr>
+                                <th>Campanha</th>
+                                <th>Status</th>
+                                <th>Gasto</th>
+                                <th>Impressões</th>
+                                <th>Cliques</th>
+                                <th>CTR</th>
+                                <th>Conversões</th>
+                                <th>CPA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-campanhas">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PAGE: NOVA VENDA ========== -->
+        <section class="page" id="page-nova-venda">
+            <div class="page-header">
+                <div>
+                    <h2>Adicionar Nova Venda</h2>
+                    <p class="page-subtitle">Registre uma venda manualmente</p>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="form-nova-venda">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="venda-data">Data</label>
+                            <input type="datetime-local" id="venda-data" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-cliente">Cliente</label>
+                            <input type="text" id="venda-cliente" placeholder="Nome do cliente" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-email">Email</label>
+                            <input type="email" id="venda-email" placeholder="email@exemplo.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-produto">Produto</label>
+                            <input type="text" id="venda-produto" placeholder="Nome do produto" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-valor">Valor (R$)</label>
+                            <input type="number" id="venda-valor" step="0.01" min="0" placeholder="0,00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-status">Status</label>
+                            <select id="venda-status" required>
+                                <option value="APROVADO">Aprovado</option>
+                                <option value="PENDENTE">Pendente</option>
+                                <option value="REEMBOLSADO">Reembolsado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-pagamento">Pagamento</label>
+                            <select id="venda-pagamento" required>
+                                <option value="Pix">Pix</option>
+                                <option value="Cartão">Cartão</option>
+                                <option value="Boleto">Boleto</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-campanha">Campanha <span class="optional">(opcional)</span></label>
+                            <input type="text" id="venda-campanha" placeholder="Nome da campanha do Meta Ads">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venda-anuncio">Anúncio <span class="optional">(opcional)</span></label>
+                            <input type="text" id="venda-anuncio" placeholder="Nome do anúncio">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-outline">
+                            <i data-lucide="x"></i>
+                            Limpar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="check"></i>
+                            Salvar Venda
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========== PAGE: CONFIGURAÇÕES ========== -->
+        <section class="page" id="page-config">
+            <div class="page-header">
+                <div>
+                    <h2>Configurações</h2>
+                    <p class="page-subtitle">Configure suas integrações</p>
+                </div>
+            </div>
+
+            <!-- CentralCart Webhook Card -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <div class="config-card-title">
+                        <i data-lucide="zap"></i>
+                        <h3>Integração Automática CentralCart (Webhooks)</h3>
+                    </div>
+                    <span class="connection-badge">
+                        <span class="dot dot-green"></span>
+                        <span>Disponível</span>
+                    </span>
+                </div>
+
+                <div class="config-card-body">
+                    <p class="config-description">
+                        Na CentralCart, clique na aba <strong>Webhooks</strong> e depois no botão <strong>+ Criar webhook</strong>. Cole o link abaixo no campo <strong>URL (HTTPS)</strong>.
+                    </p>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Sua URL do Webhook</label>
+                        <div style="display: flex; gap: 8px; margin-top: 6px;">
+                            <input type="text" id="active-webhook-url" readonly value="Carregando URL..." style="flex: 1; background: rgba(0,0,0,0.3); font-family: monospace; color: #10b981; font-weight: 600;">
+                            <button type="button" class="btn btn-primary" onclick="App.copiarWebhookUrl()">
+                                <i data-lucide="copy"></i> Copiar URL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="help-steps">
+                        <div class="help-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Copie a URL acima</h4>
+                                <p>Clique no botão <strong>Copiar URL</strong> acima.</p>
+                            </div>
+                        </div>
+                        <div class="help-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Cole no modal da CentralCart</h4>
+                                <p>Cole o link na caixa <strong>URL (HTTPS)</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="help-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Ative os eventos e salve</h4>
+                                <p>Ative <code>Pedido criado</code>, <code>Pedido aprovado</code>, <code>Pedido reembolsado</code> e <code>Pedido com chargeback</code>, e clique em <strong>Criar</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meta Ads Integration -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <div class="config-card-title">
+                        <i data-lucide="share-2"></i>
+                        <h3>Integração Meta Ads</h3>
+                    </div>
+                    <span class="connection-badge" id="config-meta-status">
+                        <span class="dot dot-red"></span>
+                        <span>Desconectado</span>
+                    </span>
+                </div>
+
+                <div class="config-card-body">
+                    <p class="config-description">
+                        Conecte sua conta do Meta Ads para puxar automaticamente os dados de gastos, impressões e cliques das suas campanhas.
+                    </p>
+
+                    <form id="form-config-meta">
+                        <div class="form-group">
+                            <label for="config-meta-token">Access Token</label>
+                            <input type="password" id="config-meta-token" placeholder="Cole seu Meta Access Token aqui">
+                            <small class="form-help">Obtenha em: Facebook Business → Configurações → Usuários do Sistema → Gerar Token</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="config-meta-account">Ad Account ID</label>
+                            <input type="text" id="config-meta-account" placeholder="act_XXXXXXXXX">
+                            <small class="form-help">Encontre em: Gerenciador de Anúncios → Configurações da Conta</small>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="save"></i>
+                                Salvar Configuração
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- How to get credentials -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <div class="config-card-title">
+                        <i data-lucide="help-circle"></i>
+                        <h3>Como obter as credenciais</h3>
+                    </div>
+                </div>
+
+                <div class="config-card-body">
+                    <div class="help-steps">
+                        <div class="help-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Acesse o Facebook Business</h4>
+                                <p>Vá em <strong>business.facebook.com/settings</strong> e entre na sua conta de negócios.</p>
+                            </div>
+                        </div>
+
+                        <div class="help-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Crie um Usuário do Sistema</h4>
+                                <p>Vá em <strong>Usuários → Usuários do Sistema</strong> e crie um novo usuário.</p>
+                            </div>
+                        </div>
+
+                        <div class="help-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Gere o Access Token</h4>
+                                <p>Clique no usuário criado, depois em <strong>Gerar Token</strong>. Selecione as permissões <strong>ads_read</strong> e <strong>ads_management</strong>.</p>
+                            </div>
+                        </div>
+
+                        <div class="help-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Copie o Ad Account ID</h4>
+                                <p>No Gerenciador de Anúncios, vá em <strong>Configurações da Conta</strong>. O ID começa com <strong>act_</strong> seguido de números.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="config-card">
+                <div class="config-card-header">
+                    <div class="config-card-title">
+                        <i data-lucide="info"></i>
+                        <h3>Sobre</h3>
+                    </div>
+                </div>
+
+                <div class="config-card-body">
+                    <div class="about-info">
+                        <div class="about-row">
+                            <span class="about-label">Aplicação</span>
+                            <span class="about-value">BloxLoja Dashboard</span>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-label">Versão</span>
+                            <span class="about-value">1.0.0</span>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-label">Plataforma de Vendas</span>
+                            <span class="about-value">CentralCart</span>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-label">Plataforma de Ads</span>
+                            <span class="about-value">Meta Ads (Facebook/Instagram)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== TOAST CONTAINER ==================== -->
+    <div id="toast-container"></div>
+
+    <!-- ==================== OVERLAY (mobile) ==================== -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
